@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>イオンモール津田沼 接客サポートカレンダー</title>
     
-    <!-- Favicon & Home Screen Icon (SVG形式で直接記述) -->
+    <!-- スマホ用のアプリアイコンとカラー設定 -->
+    <meta name="theme-color" content="#b5006b">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23b5006b'/><path d='M25 35h50v45H25z' fill='white'/><path d='M35 20v15M65 20v15M25 50h50' stroke='%23b5006b' stroke-width='8' stroke-linecap='round'/><rect x='35' y='60' width='10' height='10' fill='%23b5006b'/><rect x='55' y='60' width='10' height='10' fill='%23b5006b'/></svg>">
-    <!-- スマホのホーム画面に追加した時のアイコン用 -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23b5006b'/><path d='M25 35h50v45H25z' fill='white'/><path d='M35 20v15M65 20v15M25 50h50' stroke='%23b5006b' stroke-width='8' stroke-linecap='round'/><rect x='35' y='60' width='10' height='10' fill='%23b5006b'/><rect x='55' y='60' width='10' height='10' fill='%23b5006b'/></svg>">
+
+    <!-- フルスクリーン起動(PWA)のための設定群 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="イオンCP">
+    <!-- Web App Manifest (Data URI形式で直接埋め込み: display=standaloneでURLバーを消す) -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E3%82%A4%E3%82%AA%E3%83%B3%E6%B4%A5%E7%94%B0%E6%B2%BC%20%E6%8E%A5%E5%AE%A2%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%22%2C%22short_name%22%3A%22%E3%82%A4%E3%82%AA%E3%83%B3CP%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%23b5006b%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%23b5006b'%2F%3E%3Cpath%20d%3D'M25%2035h50v45H25z'%20fill%3D'white'%2F%3E%3Cpath%20d%3D'M35%2020v15M65%2020v15M25%2050h50'%20stroke%3D'%23b5006b'%20stroke-width%3D'8'%20stroke-linecap%3D'round'%2F%3E%3Crect%20x%3D'35'%20y%3D'60'%20width%3D'10'%20height%3D'10'%20fill%3D'%23b5006b'%2F%3E%3Crect%20x%3D'55'%20y%3D'60'%20width%3D'10'%20height%3D'10'%20fill%3D'%23b5006b'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -203,7 +210,7 @@
                 <div class="w-10 h-10 bg-slate-100 rounded-[14px] flex items-center justify-center shrink-0">
                     <i data-lucide="info" class="w-5 h-5 text-slate-500"></i>
                 </div>
-                <p class="text-[13px] text-slate-700 font-bold leading-snug">各キャンペーンの特典や対象条件の一覧です</p>
+                <p class="text-[13px] text-slate-700 font-bold leading-snug">特典内容や対象条件をチェックできます。</p>
             </div>
             <div id="dictionary-list" class="space-y-4 pb-6"></div>
         </section>
@@ -481,6 +488,13 @@
         let currentTab = 'calendar'; 
         let activeUrlToOpen = BASE_URL;
 
+        // 【PWA】インストールプロンプトイベントのキャッチ
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
         window.onload = function() {
             lucide.createIcons();
             renderCalendarLegend();
@@ -502,10 +516,58 @@
                     // クロスフェードの長さに合わせて非表示にする（1.2秒後）
                     setTimeout(() => {
                         splash.style.display = 'none';
+                        // 扉ページが消えた後に、必要であればインストール案内バナーを出す
+                        showInstallBanner();
                     }, 1200); 
                 }
             }, 2000); // 2秒間表示してからフェードアウト開始
         };
+
+        // アプリとしてホーム画面に追加する案内バナーを表示
+        function showInstallBanner() {
+            // 既にスタンドアロンモード（アプリとして起動中）または非表示設定なら出さない
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem('hideInstallBanner')) {
+                return;
+            }
+
+            const banner = document.createElement('div');
+            banner.id = 'install-banner';
+            banner.className = 'fixed bottom-20 left-4 right-4 bg-slate-800 text-white p-3.5 rounded-[20px] shadow-xl flex items-center justify-between z-40 page-active';
+            banner.innerHTML = `
+                <div class="flex items-center space-x-3.5" onclick="triggerInstall()" style="cursor:pointer;">
+                    <div class="bg-aeon-primary p-2 rounded-xl shadow-inner"><i data-lucide="download" class="w-5 h-5 text-white"></i></div>
+                    <div>
+                        <p class="text-[12px] font-black tracking-wide leading-tight">ホーム画面に追加して<br>アプリとして利用できます</p>
+                    </div>
+                </div>
+                <button onclick="closeInstallBanner()" class="p-2.5 active:scale-90 bg-slate-700 rounded-full"><i data-lucide="x" class="w-4 h-4 text-slate-300"></i></button>
+            `;
+            
+            document.body.appendChild(banner);
+            lucide.createIcons();
+        }
+
+        function closeInstallBanner() {
+            const banner = document.getElementById('install-banner');
+            if (banner) {
+                banner.remove();
+                localStorage.setItem('hideInstallBanner', 'true');
+            }
+        }
+
+        async function triggerInstall() {
+            if (deferredPrompt) {
+                // 自動インストールプロンプトを表示 (Android Chrome等)
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                closeInstallBanner();
+            } else {
+                // iOS Safariなど自動プロンプトが出ない場合の手動案内
+                alert('ブラウザの下部メニュー「共有」から「ホーム画面に追加」を選択してください。');
+                closeInstallBanner();
+            }
+        }
 
         function getCampaignsForDate(date) {
             const dayOfMonth = date.getDate();
