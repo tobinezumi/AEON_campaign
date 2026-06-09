@@ -14,7 +14,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="イオンCP">
-    <!-- Web App Manifest (Data URI形式で直接埋め込み: display=standaloneでURLバーを消す) -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E3%82%A4%E3%82%AA%E3%83%B3%E6%B4%A5%E7%94%B0%E6%B2%BC%20%E6%8E%A5%E5%AE%A2%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%22%2C%22short_name%22%3A%22%E3%82%A4%E3%82%AA%E3%83%B3CP%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%23b5006b%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%23b5006b'%2F%3E%3Cpath%20d%3D'M25%2035h50v45H25z'%20fill%3D'white'%2F%3E%3Cpath%20d%3D'M35%2020v15M65%2020v15M25%2050h50'%20stroke%3D'%23b5006b'%20stroke-width%3D'8'%20stroke-linecap%3D'round'%2F%3E%3Crect%20x%3D'35'%20y%3D'60'%20width%3D'10'%20height%3D'10'%20fill%3D'%23b5006b'%2F%3E%3Crect%20x%3D'55'%20y%3D'60'%20width%3D'10'%20height%3D'10'%20fill%3D'%23b5006b'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 
     <!-- Tailwind CSS -->
@@ -58,9 +57,21 @@
 
         .sheet-handle { width: 36px; height: 5px; background-color: #cbd5e1; border-radius: 99px; margin: 8px auto 16px auto; }
 
-        /* スプラッシュ画面のクロスフェードを長く(1.2秒) */
+        /* スプラッシュ全体(白背景含む)のフェードアウトを1.5秒に設定 */
         #splash-screen {
-            transition: opacity 1.2s ease-in-out;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* アイコンのフェードインアニメーション */
+        @keyframes iconAppear {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .icon-appear {
+            /* 最初は完全に透明（白背景だけが見える状態） */
+            opacity: 0;
+            /* 0.6秒待ってから、0.8秒かけてフェードイン。終わったらそのまま表示保持(forwards) */
+            animation: iconAppear 0.8s ease-out 0.6s forwards;
         }
 
         /* キラキラ光るエフェクト (Shimmer) */
@@ -75,8 +86,11 @@
             left: 0;
             width: 40%;
             height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-            animation: shimmer 2.5s infinite;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+            /* 初期位置を固定して見えなくする */
+            transform: translateX(-150%) skewX(-15deg);
+            /* アイコンが完全に表示されるタイミング(0.6s + 0.8s = 1.4s後)に、1.2秒かけて1回だけ光る */
+            animation: shimmer 1.2s ease-in-out 1.4s 1 forwards;
             z-index: 20;
         }
     </style>
@@ -86,9 +100,10 @@
     <!-- ========================================== -->
     <!-- 扉ページ (Splash Screen) -->
     <!-- ========================================== -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-sm flex items-center justify-center opacity-100">
-        <!-- 大きなアイコン + キラキラエフェクト追加 -->
-        <div class="w-64 h-64 rounded-[56px] bg-gradient-to-b from-[#e6007e] to-[#a0005a] shadow-[0_20px_50px_-12px_rgba(181,0,107,0.5)] flex flex-col items-center justify-center text-white p-4 relative overflow-hidden shimmer-effect">
+    <!-- 背景は完全に真っ白 (bg-white) -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center opacity-100">
+        <!-- 0.6秒後に0.8秒で現れるアイコン (icon-appear クラス) -->
+        <div class="icon-appear w-64 h-64 rounded-[56px] bg-gradient-to-b from-[#e6007e] to-[#a0005a] shadow-[0_20px_50px_-12px_rgba(181,0,107,0.5)] flex flex-col items-center justify-center text-white p-4 relative overflow-hidden shimmer-effect">
             <!-- ちょっとした光沢感（上部のハイライト） -->
             <div class="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-b-[100%]"></div>
             
@@ -508,19 +523,20 @@
             renderTodayTab();
 
             // 扉ページの制御
+            // 0.6s(白待機) + 0.8s(出現) + 2.0s(待機) = 3.4秒(3400ms)後にフェードアウト開始
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
                     splash.classList.remove('opacity-100');
                     splash.classList.add('opacity-0');
-                    // クロスフェードの長さに合わせて非表示にする（1.2秒後）
+                    // クロスフェードの長さ(1.5秒)に合わせて完全に非表示にする
                     setTimeout(() => {
                         splash.style.display = 'none';
-                        // 扉ページが消えた後に、必要であればインストール案内バナーを出す
+                        // 扉ページが消えた後にインストール案内バナーを出す
                         showInstallBanner();
-                    }, 1200); 
+                    }, 1500); 
                 }
-            }, 2000); // 2秒間表示してからフェードアウト開始
+            }, 3400); 
         };
 
         // アプリとしてホーム画面に追加する案内バナーを表示
