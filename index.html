@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>イオンモール津田沼 接客サポートカレンダー</title>
+    
+    <!-- Favicon & Home Screen Icon (SVG形式で直接記述) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23b5006b'/><path d='M25 35h50v45H25z' fill='white'/><path d='M35 20v15M65 20v15M25 50h50' stroke='%23b5006b' stroke-width='8' stroke-linecap='round'/><rect x='35' y='60' width='10' height='10' fill='%23b5006b'/><rect x='55' y='60' width='10' height='10' fill='%23b5006b'/></svg>">
+    <!-- スマホのホーム画面に追加した時のアイコン用 -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23b5006b'/><path d='M25 35h50v45H25z' fill='white'/><path d='M35 20v15M65 20v15M25 50h50' stroke='%23b5006b' stroke-width='8' stroke-linecap='round'/><rect x='35' y='60' width='10' height='10' fill='%23b5006b'/><rect x='55' y='60' width='10' height='10' fill='%23b5006b'/></svg>">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aeon: {
+                            primary: '#b5006b',
+                            primaryDark: '#8c0354',
+                            secondary: '#ff2a85',
+                            light: '#fdf2f8',
+                            bg: '#f4f6f9'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 16px -4px rgba(0, 0, 0, 0.06)',
+                        'float': '0 10px 25px -5px rgba(181, 0, 107, 0.2)',
+                        'header': '0 4px 20px -8px rgba(181, 0, 107, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { -webkit-tap-highlight-color: transparent; touch-action: pan-y; }
+        
+        .page-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .page-active { display: block; animation: fadeIn 0.25s ease-out forwards; }
+        .page-hidden { display: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sheet-handle { width: 36px; height: 5px; background-color: #cbd5e1; border-radius: 99px; margin: 8px auto 16px auto; }
+
+        /* スプラッシュ画面のクロスフェードを長く(1.2秒) */
+        #splash-screen {
+            transition: opacity 1.2s ease-in-out;
+        }
+
+        /* キラキラ光るエフェクト (Shimmer) */
+        @keyframes shimmer {
+            0% { transform: translateX(-150%) skewX(-15deg); }
+            100% { transform: translateX(250%) skewX(-15deg); }
+        }
+        .shimmer-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2.5s infinite;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-aeon-bg text-slate-800 font-sans min-h-screen pb-24 overflow-x-hidden">
+
+    <!-- ========================================== -->
+    <!-- 扉ページ (Splash Screen) -->
+    <!-- ========================================== -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-sm flex items-center justify-center opacity-100">
+        <!-- 大きなアイコン + キラキラエフェクト追加 -->
+        <div class="w-64 h-64 rounded-[56px] bg-gradient-to-b from-[#e6007e] to-[#a0005a] shadow-[0_20px_50px_-12px_rgba(181,0,107,0.5)] flex flex-col items-center justify-center text-white p-4 relative overflow-hidden shimmer-effect">
+            <!-- ちょっとした光沢感（上部のハイライト） -->
+            <div class="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-b-[100%]"></div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="flex items-center justify-center mb-2">
+                    <span class="text-[32px] font-sans font-black tracking-widest" style="font-family: Arial, sans-serif;">
+                        AEON
+                    </span>
+                </div>
+                <div class="text-[22px] font-black tracking-widest mb-6">定期キャンペーン</div>
+                <i data-lucide="calendar-days" class="w-24 h-24 stroke-[1.5]"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top App Bar -->
+    <header class="fixed top-0 w-full z-40 bg-gradient-to-r from-pink-50/95 via-white/95 to-white/95 backdrop-blur-xl border-b border-pink-100/50 shadow-header">
+        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between relative">
+            <div class="flex flex-col justify-center">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-aeon-primary text-white font-black rounded-lg px-2.5 py-0.5 text-[11px] tracking-widest shadow-sm">AEON津田沼</span>
+                </div>
+                <h1 class="text-[20px] font-black tracking-widest text-slate-700 mt-0.5" id="header-title">定期キャンペーン</h1>
+            </div>
+            <button onclick="openAeonOfficialFromHeader()" class="flex flex-col items-center justify-center text-aeon-primary bg-white/80 hover:bg-pink-50 rounded-xl px-3 py-1.5 active:scale-95 transition-all border border-pink-100/60 shadow-sm">
+                <i data-lucide="external-link" class="w-4 h-4 mb-0.5"></i>
+                <span class="text-[9px] font-black tracking-wider">公式最新</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-4 pt-20 relative min-h-screen">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: SCHEDULE VIEW                       -->
+        <!-- ========================================== -->
+        <section id="tab-calendar" class="page-active space-y-4 mt-2">
+            
+            <div class="bg-white rounded-[32px] p-2 shadow-soft border border-slate-50">
+                <div class="flex items-center justify-between px-2 pt-2 pb-2" id="calendar-header-margin">
+                    <button onclick="navigateCalendar(-1)" class="p-2.5 hover:bg-slate-50 rounded-2xl active:scale-95 transition-all text-slate-400 hover:text-slate-600">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <div class="flex flex-col items-center">
+                        <h2 id="calendar-title" class="text-xl font-black text-slate-800 tracking-tight">2026年6月</h2>
+                        <div class="bg-slate-100/80 p-1 rounded-xl flex mt-1 shadow-inner">
+                            <button onclick="setCalendarMode('week')" id="btn-mode-week" class="w-16 py-1 text-xs font-black rounded-lg bg-pink-50 text-aeon-primary shadow-sm border border-pink-100 transition-all">週</button>
+                            <button onclick="setCalendarMode('month')" id="btn-mode-month" class="w-16 py-1 text-xs font-black rounded-lg text-slate-400 hover:text-slate-600 transition-all">月</button>
+                        </div>
+                    </div>
+
+                    <button onclick="navigateCalendar(1)" class="p-2.5 hover:bg-slate-50 rounded-2xl active:scale-95 transition-all text-slate-400 hover:text-slate-600">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div id="calendar-grid-container" class="transition-all duration-300 overflow-hidden hidden px-2 pb-2">
+                    <div id="calendar-legend" class="flex flex-wrap justify-center gap-x-1.5 gap-y-1.5 py-2 mb-1 border-y border-slate-50 items-center px-1"></div>
+                    <div class="grid grid-cols-7 gap-1 text-center mb-1">
+                        <div class="text-[10px] font-bold text-red-500">日</div>
+                        <div class="text-[10px] font-bold text-slate-400">月</div>
+                        <div class="text-[10px] font-bold text-slate-400">火</div>
+                        <div class="text-[10px] font-bold text-slate-400">水</div>
+                        <div class="text-[10px] font-bold text-slate-400">木</div>
+                        <div class="text-[10px] font-bold text-slate-400">金</div>
+                        <div class="text-[10px] font-bold text-blue-500">土</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-y-1 gap-x-1 transition-all duration-300 relative"></div>
+                </div>
+            </div>
+
+            <div class="pb-6">
+                <div class="flex items-center justify-between mb-3 px-2">
+                    <h3 id="weekly-campaigns-label" class="text-[13px] font-black text-slate-700 tracking-tight">定期キャンペーン</h3>
+                </div>
+
+                <div id="weekly-campaigns-container" class="pl-2 pr-1">
+                    <!-- Dynamic cards per day -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: TODAY / DAILY VIEW                  -->
+        <!-- ========================================== -->
+        <section id="tab-today" class="page-hidden space-y-5 pt-2">
+            <div class="bg-gradient-to-br from-aeon-primary to-aeon-secondary rounded-[32px] p-7 text-white shadow-float relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-xl -ml-10 -mb-10"></div>
+                
+                <div class="relative z-10 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-6">
+                        <div id="today-badge-container" class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20"></div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="navigateTodayTab(-1)" class="p-2.5 bg-white/20 rounded-xl hover:bg-white/30 backdrop-blur-md active:scale-90 transition">
+                                <i data-lucide="chevron-left" class="w-4 h-4 text-white"></i>
+                            </button>
+                            <button onclick="navigateTodayTab(1)" class="p-2.5 bg-white/20 rounded-xl hover:bg-white/30 backdrop-blur-md active:scale-90 transition">
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-4xl font-black mb-1.5 tracking-tighter" id="today-hero-date">6/7 <span class="text-xl font-bold ml-1">SUN</span></h2>
+                        <p class="text-sm font-bold opacity-90" id="today-hero-desc">本日のキャンペーンを確認</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="today-campaigns-list" class="space-y-4 pb-6"></div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: DICTIONARY                          -->
+        <!-- ========================================== -->
+        <section id="tab-dictionary" class="page-hidden space-y-4 pt-2">
+            <div class="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100 flex items-center space-x-4 mb-6">
+                <div class="w-10 h-10 bg-slate-100 rounded-[14px] flex items-center justify-center shrink-0">
+                    <i data-lucide="info" class="w-5 h-5 text-slate-500"></i>
+                </div>
+                <p class="text-[13px] text-slate-700 font-bold leading-snug">各キャンペーンの特典や対象条件を一覧で確認できます。</p>
+            </div>
+            <div id="dictionary-list" class="space-y-4 pb-6"></div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 pb-safe pt-2.5 px-8 flex justify-between z-40" style="padding-bottom: env(safe-area-inset-bottom, 20px);">
+        <button onclick="switchTab('calendar')" id="nav-calendar" class="flex flex-col items-center p-2 text-aeon-primary w-24 transition-all active:scale-95 transform -translate-y-1">
+            <i data-lucide="calendar" class="w-6 h-6 mb-1"></i>
+            <span class="text-[9px] font-black tracking-wide">スケジュール</span>
+        </button>
+        <button onclick="switchTab('today')" id="nav-today" class="flex flex-col items-center p-2 text-slate-400 hover:text-slate-600 w-24 transition-all active:scale-95 relative">
+            <i data-lucide="sparkles" class="w-6 h-6 mb-1"></i>
+            <span class="text-[9px] font-black tracking-wide">本日のCP</span>
+        </button>
+        <button onclick="switchTab('dictionary')" id="nav-dictionary" class="flex flex-col items-center p-2 text-slate-400 hover:text-slate-600 w-24 transition-all active:scale-95">
+            <i data-lucide="book-open" class="w-6 h-6 mb-1"></i>
+            <span class="text-[9px] font-black tracking-wide">キャンペーン説明</span>
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- BOTTOM SHEET MODAL                         -->
+    <!-- ========================================== -->
+    <div id="bottom-sheet" class="fixed inset-0 z-50 flex items-end justify-center pointer-events-none transition-all duration-300">
+        <div id="sheet-backdrop" onclick="closeSheet()" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        <div id="sheet-content" class="bg-white w-full max-w-md rounded-t-[36px] shadow-2xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[85vh] relative z-10">
+            <div class="sheet-handle"></div>
+            
+            <div class="px-7 pb-5 border-b border-slate-100 flex items-start justify-between shrink-0 pt-2">
+                <div class="flex items-center space-x-4">
+                    <div id="sheet-icon-box" class="w-12 h-12 rounded-[20px] flex items-center justify-center text-white shrink-0 shadow-inner">
+                        <i data-lucide="star" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p id="sheet-subtitle" class="text-[10px] font-black text-slate-400 mb-0.5 tracking-wider">サイクル</p>
+                        <h3 id="sheet-title" class="text-xl font-black text-slate-800 leading-tight tracking-tight">タイトル</h3>
+                    </div>
+                </div>
+                <button onclick="closeSheet()" class="p-2.5 bg-slate-100 rounded-full text-slate-500 active:scale-90 transition shrink-0">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-7 overflow-y-auto no-scrollbar space-y-6">
+                <div class="bg-pink-50/80 rounded-[24px] p-5 border border-pink-100 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 opacity-10 text-pink-500"><i data-lucide="percent" class="w-28 h-28"></i></div>
+                    <span class="text-[10px] font-black text-pink-600 block mb-1.5 relative z-10 tracking-wider">お客さまへの特典</span>
+                    <p id="sheet-benefit" class="text-base font-black text-slate-800 relative z-10">5% OFF</p>
+                </div>
+
+                <div>
+                    <h4 class="text-[11px] font-black text-aeon-primary uppercase tracking-wider mb-3 flex items-center space-x-1.5">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i><span>接客・案内ポイント</span>
+                    </h4>
+                    <p id="sheet-tips" class="text-[13px] font-medium text-slate-700 leading-relaxed bg-slate-50 p-5 rounded-[24px] border border-slate-100 text-left"></p>
+                </div>
+
+                <div>
+                    <h4 class="text-[11px] font-black text-emerald-600 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i><span>適用条件（OK）</span>
+                    </h4>
+                    <ul id="sheet-conditions" class="space-y-2.5 text-xs font-bold text-emerald-700 bg-emerald-50 p-5 rounded-[24px] text-left border border-emerald-100/50"></ul>
+                </div>
+
+                <div id="sheet-exclusions-container">
+                    <h4 class="text-[11px] font-black text-red-500 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i><span>対象外（NG・注意）</span>
+                    </h4>
+                    <ul id="sheet-exclusions" class="space-y-2.5 text-xs font-bold text-red-700 bg-red-50 p-5 rounded-[24px] text-left border border-red-100/50"></ul>
+                </div>
+
+                <button onclick="openOfficialSiteFromSheet()" class="flex items-center justify-center w-full py-4 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-2xl transition active:scale-[0.98] shadow-soft space-x-2 mt-6">
+                    <span>公式のキャンペーン詳細を確認</span><i data-lucide="external-link" class="w-4 h-4"></i>
+                </button>
+                <div class="h-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://www.aeonretail.jp/sp/otoku/';
+
+        const CAMPAIGNS = [
+            { 
+                id: 'kansha_day', 
+                title: 'お客さま感謝デー', 
+                shortTitle: '感謝デー', 
+                subtitle: '毎月20日・30日', 
+                benefit: '5% OFF', 
+                url: 'https://www.aeonretail.jp/otoku/kansyaday.html', 
+                conditions: [
+                    'イオンカードのご提示（現金払い含む）、またはお支払い', 
+                    'AEON Payのスマホ決済、イオンiD', 
+                    '電子マネーWAONのお支払い', 
+                    'イオンオーナーズカードのご提示'
+                ],
+                exclusions: [
+                    'WAON POINTカードのご提示のみ',
+                    '他社発行のクレジットカード・電子マネー',
+                    'ビール・発泡酒、たばこ、書籍、ゲーム機本体など特定商品',
+                    '一部の専門店（各店舗へ要確認）'
+                ],
+                tips: 'お支払い前に必ずイオンカード等のご提示をお願いしてください。ポイントカードのみでは5%OFFにならない点がお客さまからよく質問されます。', 
+                color: 'bg-pink-500', dotColor: 'bg-pink-500', bgSoft: 'bg-pink-50', borderSoft: 'border-pink-100', text: 'text-pink-600', dates: [20, 30], icon: 'percent' 
+            },
+            { 
+                id: 'ariga10_day', 
+                title: 'ありが10デー', 
+                shortTitle: 'ありが10', 
+                subtitle: '毎月10日', 
+                benefit: 'ポイント5〜10倍', 
+                url: 'https://www.aeonretail.jp/campaign/ariga10/', 
+                conditions: [
+                    'AEON Payのスマホ決済で【10倍】', 
+                    'イオンカードのクレジット払い・提示で【5倍】', 
+                    '電子マネーWAONのお支払いで【5倍】'
+                ],
+                exclusions: [
+                    'WAON POINTのご利用分（ポイントでのお支払い分）',
+                    '調剤薬品、たばこ、商品券など特定商品',
+                    '他の倍付け企画（いつでもポイント2倍など）との併用'
+                ], 
+                tips: 'AEON Pay決済が一番お得（10倍）であることをご案内すると喜ばれます。「ポイントでお支払いした分にはポイントが付きません」という点はトラブル防止のためご注意ください。', 
+                color: 'bg-amber-500', dotColor: 'bg-amber-400', bgSoft: 'bg-amber-50', borderSoft: 'border-amber-100', text: 'text-amber-600', dates: [10], icon: 'star' 
+            },
+            { 
+                id: 'gg_day', 
+                title: 'G.G感謝デー', 
+                shortTitle: 'G.G感謝', 
+                subtitle: '毎月15日 (55歳以上)', 
+                benefit: '5% OFF', 
+                url: 'https://www.aeonretail.jp/otoku/ggkansyaday/', 
+                conditions: [
+                    '55歳以上のお客さま', 
+                    'G.Gマーク付きのイオンカード決済、またはG.G WAON等の利用'
+                ],
+                exclusions: [
+                    'イオンカードのクレジット払いは【レジでの割引ではなくご請求時】に5%割引',
+                    'AEON Payのチャージ払い・WAON POINT利用分',
+                    '通常のWAONカード（事前にWAONステーションでの設定が必要）',
+                    'ビール・発泡酒、たばこなど特定商品'
+                ], 
+                tips: 'クレジット払いのお客さまには「レジではそのままの金額ですが、お引き落としの際に5%割引されます」と必ずお伝えください。毎月15日は「わくわくデー（ポイント2倍）」も同時開催です。', 
+                color: 'bg-purple-500', dotColor: 'bg-purple-500', bgSoft: 'bg-purple-50', borderSoft: 'border-purple-100', text: 'text-purple-600', dates: [15], icon: 'user-check' 
+            },
+            { 
+                id: 'tuyou_ichi', 
+                title: '火曜市', 
+                shortTitle: '火曜市', 
+                subtitle: '毎週火曜日開催', 
+                benefit: '直営・専門店特典', 
+                url: 'https://www.aeon.jp/sc/tsudanuma/special/kayouichi/', 
+                conditions: [
+                    '直営店は「午前中セール（～12:00まで）」と「夕方市」を実施',
+                    '専門店でも飲食・サービス等の火曜限定特典あり'
+                ],
+                exclusions: [
+                    '専門店の特典は店舗ごとに異なります。',
+                    '（例：一部商品の除外、内容が予告なく変更される場合あり）'
+                ], 
+                tips: '直営店の特売だけでなく、モール全体でお得な日です。お客さまに専門店（カルディ、サブウェイ等）での5%OFFや限定割引もやっていることをご案内すると、モール内の回遊率アップに繋がります。', 
+                color: 'bg-orange-500', dotColor: 'bg-orange-500', bgSoft: 'bg-orange-50', borderSoft: 'border-orange-100', text: 'text-orange-600', dayOfWeek: 2, icon: 'shopping-cart' 
+            },
+            { 
+                id: 'installment_free', 
+                title: '分割払い手数料0', 
+                shortTitle: '分割手数料', 
+                subtitle: '毎月20日・30日', 
+                benefit: '分割手数料無料', 
+                url: 'https://www.aeon.co.jp/benefits/bunkatsu0/', 
+                conditions: [
+                    '毎月20日・30日の限定開催',
+                    'イオンカードのクレジット払いで対象の分割払いを選択',
+                    '※1回のご精算金額が税込1万円以上、かつ月々のお支払金額が税込3千円以上'
+                ],
+                exclusions: [
+                    'ボーナス併用払いは対象外',
+                    '一部の専門店および商品は対象外'
+                ], 
+                tips: '毎月20日・30日の「お客さま感謝デー」と同日開催です。家電などの高額商品をご検討中のお客さまには、感謝デーの割引と合わせて「本日なら分割手数料も無料ですよ」とお声がけすると成約率が上がります。', 
+                color: 'bg-teal-500', dotColor: 'bg-teal-400', bgSoft: 'bg-teal-50', borderSoft: 'border-teal-100', text: 'text-teal-600', dates: [20, 30], icon: 'credit-card' 
+            },
+            { 
+                id: 'yellow_receipt', 
+                title: '幸せの黄色いレシート', 
+                shortTitle: '黄色レシート', 
+                subtitle: '毎月11日', 
+                benefit: '1%が寄付に', 
+                url: BASE_URL, 
+                conditions: ['発行された黄色いレシートを専用ボックスに投函していただく'],
+                exclusions: [], 
+                tips: 'レジでお渡しする際、「よろしければ専用ボックスにご投函ください、地域のボランティア支援になります」と一言添えるのがポイントです。', 
+                color: 'bg-yellow-400', dotColor: 'bg-yellow-400', bgSoft: 'bg-yellow-50', borderSoft: 'border-yellow-200', text: 'text-yellow-700', dates: [11], icon: 'receipt' 
+            },
+            { 
+                id: 'pet_10x', 
+                title: 'ペットフード・用品10倍', 
+                shortTitle: 'ペット10倍', 
+                subtitle: '1,2,11,12,21,22日', 
+                benefit: 'ポイント10倍', 
+                url: 'https://www.aeonretail.jp/campaign/pointC-pet/', 
+                conditions: [
+                    'イオン・イオンスタイル直営のペット売場', 
+                    'イオンマークのカードクレジット払い、AEON Pay決済'
+                ],
+                exclusions: [
+                    'イオンモール内のペット専門店',
+                    'WAON POINT払い、電子マネーWAON決済'
+                ], 
+                tips: '直営売場専用の企画です。モール内のペット専門店（テナント）でお買物されたお客様から「ポイント10倍にならないの？」と聞かれることがあるため、「直営売場のみのキャンペーンです」とご案内ください。', 
+                color: 'bg-emerald-500', dotColor: 'bg-emerald-500', bgSoft: 'bg-emerald-50', borderSoft: 'border-emerald-100', text: 'text-emerald-600', dates: [1, 2, 11, 12, 21, 22], icon: 'dog' 
+            },
+            { 
+                id: 'oral_10x', 
+                title: 'オーラルケアポイント10倍', 
+                shortTitle: 'ｵｰﾗﾙ10倍', 
+                subtitle: '毎月5日', 
+                benefit: 'ポイント10倍', 
+                url: 'https://www.aeonretail.jp/campaign/pointC-oral/', 
+                conditions: [
+                    'イオン・イオンスタイル直営のオーラルケア売場', 
+                    'イオンマークのカードクレジット払い、AEON Pay決済'
+                ],
+                exclusions: [
+                    '医薬品、ベビー・おもちゃ売場の商品',
+                    '専門店での購入'
+                ], 
+                tips: 'ハブラシ、歯磨き粉、マウスウォッシュ等が対象です。5日は「お客さまわくわくデー（ポイント2倍）」とも重なりますが、重複はせず「10倍」が優先されます。', 
+                color: 'bg-cyan-500', dotColor: 'bg-cyan-400', bgSoft: 'bg-cyan-50', borderSoft: 'border-cyan-100', text: 'text-cyan-600', dates: [5], icon: 'sparkles' 
+            },
+            { 
+                id: 'hair_10x', 
+                title: 'ヘアカラーポイント10倍', 
+                shortTitle: 'ﾍｱｶﾗｰ10倍', 
+                subtitle: '毎月5, 15, 25日', 
+                benefit: 'ポイント10倍', 
+                url: 'https://www.aeonretail.jp/campaign/pointC-hairc/', 
+                conditions: [
+                    'イオン・イオンスタイル直営売場', 
+                    'イオンマークのカードクレジット払い、AEON Pay決済'
+                ],
+                exclusions: [
+                    '一部の制度化粧品（スティーブンノル等）',
+                    '専門店での購入'
+                ], 
+                tips: '制度化粧品の一部は対象外となるため、お客さまに聞かれたら商品のブランドを確認してください。毎月5・15・25日と覚えやすい日程です。', 
+                color: 'bg-fuchsia-500', dotColor: 'bg-fuchsia-400', bgSoft: 'bg-fuchsia-50', borderSoft: 'border-fuchsia-100', text: 'text-fuchsia-600', dates: [5, 15, 25], icon: 'scissors' 
+            },
+            { 
+                id: 'shampoo_10x', 
+                title: 'シャンプー・リンス10倍', 
+                shortTitle: 'ｼｬﾝﾌﾟｰ10倍', 
+                subtitle: '毎月5, 10日', 
+                benefit: 'ポイント10倍', 
+                url: 'https://www.aeonretail.jp/campaign/pointC-shampoo/', 
+                conditions: [
+                    'イオン・イオンスタイル直営売場', 
+                    'イオンマークのカードクレジット払い、AEON Pay決済'
+                ],
+                exclusions: [
+                    'キュレル、ミノン、ハウスオブローゼ等の特定ブランド',
+                    'カラーシャンプー、ベビー用、ペット用'
+                ], 
+                tips: '対象外のブランドや種類（ベビー用など）が細かく分かれているので注意が必要です。迷った場合はサービスカウンターへの案内か、対象外リストをご確認ください。', 
+                color: 'bg-blue-500', dotColor: 'bg-blue-400', bgSoft: 'bg-blue-50', borderSoft: 'border-blue-100', text: 'text-blue-600', dates: [5, 10], icon: 'droplet' 
+            }
+        ];
+
+        let currentDate = new Date(2026, 5, 7); 
+        let selectedDate = new Date(2026, 5, 7);
+        let todayViewDate = new Date(2026, 5, 7); 
+        let calendarMode = 'week'; 
+        let currentTab = 'calendar'; 
+        let activeUrlToOpen = BASE_URL;
+
+        window.onload = function() {
+            lucide.createIcons();
+            renderCalendarLegend();
+            buildDictionary();
+            
+            todayViewDate = new Date(); 
+            currentDate = new Date(todayViewDate);
+            selectedDate = new Date(todayViewDate);
+
+            setCalendarMode('week');
+            renderTodayTab();
+
+            // 扉ページの制御
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash) {
+                    splash.classList.remove('opacity-100');
+                    splash.classList.add('opacity-0');
+                    // クロスフェードの長さに合わせて非表示にする（1.2秒後）
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                    }, 1200); 
+                }
+            }, 2000); // 2秒間表示してからフェードアウト開始
+        };
+
+        function getCampaignsForDate(date) {
+            const dayOfMonth = date.getDate();
+            const dayOfWeek = date.getDay(); 
+            return CAMPAIGNS.filter(camp => {
+                if (camp.dates && camp.dates.includes(dayOfMonth)) return true;
+                if (camp.dayOfWeek !== undefined && camp.dayOfWeek === dayOfWeek) return true;
+                return false;
+            });
+        }
+
+        function isSameDate(d1, d2) { return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
+
+        function getWeekRange(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const start = new Date(d);
+            start.setDate(d.getDate() - day);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            return { start, end };
+        }
+
+        function switchTab(tabId) {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
+            currentTab = tabId;
+            const titles = { 'calendar': '定期キャンペーン', 'today': '本日のキャンペーン', 'dictionary': 'キャンペーン説明' };
+            document.getElementById('header-title').textContent = titles[tabId];
+            
+            ['calendar', 'today', 'dictionary'].forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    section.classList.remove('page-hidden');
+                    section.classList.add('page-active');
+                    navBtn.classList.replace('text-slate-400', 'text-aeon-primary');
+                    navBtn.classList.add('transform', '-translate-y-1');
+                } else {
+                    section.classList.remove('page-active');
+                    section.classList.add('page-hidden');
+                    navBtn.classList.replace('text-aeon-primary', 'text-slate-400');
+                    navBtn.classList.remove('transform', '-translate-y-1');
+                }
+            });
+            if (tabId === 'today') renderTodayTab();
+        }
+
+        function setCalendarMode(mode) {
+            calendarMode = mode;
+            document.getElementById('btn-mode-week').className = mode === 'week' ? "w-16 py-1 text-xs font-black rounded-lg bg-pink-50 text-aeon-primary shadow-sm border border-pink-100 transition-all" : "w-16 py-1 text-xs font-black rounded-lg text-slate-400 hover:text-slate-600 transition-all";
+            document.getElementById('btn-mode-month').className = mode === 'month' ? "w-16 py-1 text-xs font-black rounded-lg bg-pink-50 text-aeon-primary shadow-sm border border-pink-100 transition-all" : "w-16 py-1 text-xs font-black rounded-lg text-slate-400 hover:text-slate-600 transition-all";
+            
+            const gridContainer = document.getElementById('calendar-grid-container');
+            const headerMargin = document.getElementById('calendar-header-margin');
+            
+            if (mode === 'week') {
+                gridContainer.classList.add('hidden');
+                headerMargin.classList.remove('pb-1');
+            } else {
+                gridContainer.classList.remove('hidden');
+                headerMargin.classList.add('pb-1');
+            }
+
+            renderCalendar();
+            renderScheduleList();
+        }
+
+        function navigateCalendar(dir) {
+            if (calendarMode === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
+            else currentDate.setDate(currentDate.getDate() + (dir * 7));
+            renderCalendar();
+            renderScheduleList();
+        }
+
+        function openAeonOfficialFromHeader() {
+            const url = 'https://www.aeonretail.jp/sp/otoku/';
+            try { window.open(url, '_blank', 'noopener,noreferrer'); } 
+            catch (e) {
+                const a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            }
+        }
+
+        function renderCalendarLegend() {
+            const legendContainer = document.getElementById('calendar-legend');
+            legendContainer.innerHTML = '';
+            CAMPAIGNS.forEach(camp => {
+                legendContainer.innerHTML += `<div class="flex items-center space-x-1.5 shrink-0 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100"><span class="w-2 h-2 rounded-full ${camp.dotColor}"></span><span class="text-[10px] font-black text-slate-500">${camp.shortTitle}</span></div>`;
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            let titleText = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月`;
+            if (calendarMode === 'week') {
+                const { start, end } = getWeekRange(currentDate);
+                if (start.getMonth() !== end.getMonth()) titleText = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
+                else titleText = `${currentDate.getMonth() + 1}月`;
+            }
+            document.getElementById('calendar-title').textContent = titleText;
+
+            let daysToRender = [];
+            const y = currentDate.getFullYear();
+            const m = currentDate.getMonth();
+
+            if (calendarMode === 'month') {
+                const firstDay = new Date(y, m, 1);
+                const lastDay = new Date(y, m + 1, 0);
+                for (let i = 0; i < firstDay.getDay(); i++) daysToRender.push({ date: new Date(y, m, 0 - (firstDay.getDay() - 1 - i)), isCurrentM: false });
+                for (let i = 1; i <= lastDay.getDate(); i++) daysToRender.push({ date: new Date(y, m, i), isCurrentM: true });
+                const remaining = 42 - daysToRender.length;
+                for (let i = 1; i <= remaining; i++) daysToRender.push({ date: new Date(y, m + 1, i), isCurrentM: false });
+            } else {
+                return; 
+            }
+
+            const today = new Date();
+            daysToRender.forEach(item => {
+                const d = item.date;
+                const isSelected = isSameDate(d, selectedDate);
+                const isTdy = isSameDate(d, today);
+                const camps = getCampaignsForDate(d);
+
+                const cell = document.createElement('button');
+                cell.onclick = () => {
+                    selectedDate = new Date(d);
+                    renderCalendar(); 
+                    renderScheduleList();
+                };
+
+                let bgClass = "bg-transparent";
+                let textClass = item.isCurrentM ? "text-slate-800" : "text-slate-300";
+                let weightClass = "font-bold";
+
+                if (isSelected) { bgClass = "bg-aeon-primary shadow-md"; textClass = "text-white"; weightClass = "font-black"; } 
+                else if (isTdy) { bgClass = "bg-pink-50"; textClass = "text-aeon-primary"; weightClass = "font-black"; } 
+                else {
+                    if(d.getDay() === 0 && item.isCurrentM) textClass = "text-red-500";
+                    if(d.getDay() === 6 && item.isCurrentM) textClass = "text-blue-500";
+                }
+
+                cell.className = `relative w-full h-[42px] flex flex-col items-center justify-center rounded-[14px] transition-all active:scale-90 ${bgClass}`;
+                
+                const dots = camps.slice(0, 3).map(c => `<div class="w-1.5 h-1.5 rounded-full ${c.dotColor} mb-0.5"></div>`).join('');
+                
+                cell.innerHTML = `
+                    <span class="text-sm ${textClass} ${weightClass} -mt-1">${d.getDate()}</span>
+                    <div class="absolute bottom-1 flex justify-center space-x-0.5 w-full px-1 flex-wrap">
+                        ${dots}
+                    </div>
+                `;
+                grid.appendChild(cell);
+            });
+        }
+
+        function renderScheduleList() {
+            const container = document.getElementById('weekly-campaigns-container');
+            container.innerHTML = '';
+            
+            const daysStr = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            const daysStrJa = ['日', '月', '火', '水', '木', '金', '土'];
+            const today = new Date();
+
+            if (calendarMode === 'week') {
+                const { start, end } = getWeekRange(currentDate);
+                document.getElementById('weekly-campaigns-label').textContent = `${start.getMonth()+1}/${start.getDate()}〜${end.getMonth()+1}/${end.getDate()} の定期キャンペーン`;
+
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(start);
+                    d.setDate(start.getDate() + i);
+                    const camps = getCampaignsForDate(d);
+                    const isToday = isSameDate(d, today);
+                    
+                    const row = createTimelineRow(d, camps, isToday, daysStr, daysStrJa);
+                    container.appendChild(row);
+                }
+            } else {
+                document.getElementById('weekly-campaigns-label').textContent = `${selectedDate.getMonth()+1}月${selectedDate.getDate()}日 (${daysStrJa[selectedDate.getDay()]}) の定期キャンペーン`;
+                const camps = getCampaignsForDate(selectedDate);
+                const isToday = isSameDate(selectedDate, today);
+                
+                const row = createTimelineRow(selectedDate, camps, isToday, daysStr, daysStrJa);
+                container.appendChild(row);
+            }
+            
+            lucide.createIcons();
+        }
+
+        function createTimelineRow(d, camps, isToday, daysStr, daysStrJa) {
+            const row = document.createElement('div');
+            row.className = "flex items-stretch gap-3.5 mb-6";
+            
+            const dateCol = document.createElement('div');
+            dateCol.className = "flex flex-col items-center w-11 shrink-0 pt-0.5";
+            
+            if (isToday) {
+                dateCol.innerHTML = `
+                    <div class="bg-aeon-primary text-white w-full py-2 rounded-[20px] flex flex-col items-center shadow-[0_4px_12px_rgba(181,0,107,0.3)]">
+                        <span class="text-[9px] font-black uppercase tracking-widest opacity-90 mb-0.5">${daysStr[d.getDay()]}</span>
+                        <span class="text-xl font-black leading-none">${d.getDate()}</span>
+                    </div>
+                `;
+            } else {
+                const textColor = d.getDay() === 0 ? 'text-red-400' : (d.getDay() === 6 ? 'text-blue-400' : 'text-slate-400');
+                const numColor = d.getDay() === 0 ? 'text-red-500' : (d.getDay() === 6 ? 'text-blue-500' : 'text-slate-700');
+                
+                dateCol.innerHTML = `
+                    <span class="text-[10px] font-black uppercase tracking-widest mb-0.5 ${textColor}">${daysStr[d.getDay()]}</span>
+                    <span class="text-2xl font-black leading-none ${numColor}">${d.getDate()}</span>
+                `;
+            }
+            row.appendChild(dateCol);
+            
+            const cardCol = document.createElement('div');
+            cardCol.className = "flex-1 flex flex-col gap-3";
+            
+            if (camps.length > 0) {
+                camps.forEach(camp => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-3.5 rounded-3xl shadow-[0_2px_16px_-4px_rgba(0,0,0,0.06)] border border-slate-100 flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden";
+                    card.onclick = () => openSheet(camp);
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3 overflow-hidden z-10">
+                            <div class="${camp.color} text-white w-10 h-10 rounded-[18px] flex items-center justify-center shadow-inner shrink-0">
+                                <i data-lucide="${camp.icon}" class="w-5 h-5"></i>
+                            </div>
+                            <div class="truncate">
+                                <p class="text-[9px] font-black text-slate-400 mb-0.5 truncate tracking-wide">${camp.subtitle}</p>
+                                <h4 class="text-sm font-black text-slate-800 tracking-tight truncate">${camp.title}</h4>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end shrink-0 pl-2 z-10">
+                            <span class="text-[10px] font-black ${camp.text} ${camp.bgSoft} px-2.5 py-1.5 rounded-xl border ${camp.borderSoft} shadow-sm">${camp.shortTitle === '火曜市' ? '特典あり' : camp.benefit}</span>
+                        </div>
+                    `;
+                    cardCol.appendChild(card);
+                });
+            } else {
+                cardCol.innerHTML = `
+                    <div class="w-full h-full min-h-[52px] bg-slate-50/50 border-[1.5px] border-dashed border-slate-200 rounded-[28px] py-2 px-4 flex items-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2.5"></div>
+                        <span class="text-xs font-black text-slate-400 tracking-wide">定期キャンペーン無し</span>
+                    </div>
+                `;
+            }
+            
+            row.appendChild(cardCol);
+            return row;
+        }
+
+        function navigateTodayTab(direction) {
+            todayViewDate.setDate(todayViewDate.getDate() + direction);
+            renderTodayTab();
+        }
+
+        function renderTodayTab() {
+            const isRealToday = isSameDate(todayViewDate, new Date());
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            
+            document.getElementById('today-hero-date').innerHTML = `${todayViewDate.getMonth()+1}/${todayViewDate.getDate()} <span class="text-xl font-bold ml-1">${days[todayViewDate.getDay()]}</span>`;
+            
+            const badgeContainer = document.getElementById('today-badge-container');
+            if (isRealToday) {
+                badgeContainer.innerHTML = `
+                    <span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span></span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Today</span>
+                `;
+            } else {
+                badgeContainer.innerHTML = `
+                    <i data-lucide="calendar-days" class="w-3 h-3"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">表示中の日</span>
+                `;
+            }
+
+            const camps = getCampaignsForDate(todayViewDate);
+            const list = document.getElementById('today-campaigns-list');
+            list.innerHTML = '';
+
+            if (camps.length === 0) {
+                document.getElementById('today-hero-desc').textContent = "本日は案内する定期キャンペーンはありません";
+            } else {
+                document.getElementById('today-hero-desc').textContent = `${isRealToday ? '本日' : 'この日'} ${camps.length}件 のキャンペーンを実施中`;
+                camps.forEach(camp => {
+                    const card = document.createElement('div');
+                    card.className = `bg-white p-4 rounded-3xl shadow-soft border border-slate-50 flex items-center justify-between active:scale-[0.98] transition cursor-pointer`;
+                    card.onclick = () => openSheet(camp);
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-3.5">
+                            <div class="${camp.color} text-white w-12 h-12 rounded-[20px] shadow-inner flex items-center justify-center shrink-0">
+                                <i data-lucide="${camp.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-[15px] font-black text-slate-800 tracking-tight">${camp.title}</h4>
+                                <p class="text-xs font-black ${camp.text} mt-0.5 bg-slate-50 inline-block px-1.5 py-0.5 rounded border border-slate-100">${camp.benefit}</p>
+                            </div>
+                        </div><i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function buildDictionary() {
+            const list = document.getElementById('dictionary-list');
+            list.innerHTML = '';
+            CAMPAIGNS.forEach(camp => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-[28px] shadow-sm border border-slate-100 active:scale-[0.98] transition-transform cursor-pointer flex flex-col mb-4";
+                card.onclick = () => openSheet(camp);
+                card.innerHTML = `
+                    <div class="flex items-center space-x-4 mb-3.5">
+                        <div class="${camp.color} text-white w-12 h-12 rounded-[20px] flex items-center justify-center shadow-inner shrink-0">
+                            <i data-lucide="${camp.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-base font-black text-slate-800 tracking-tight">${camp.title}</h4>
+                    </div>
+                    <div class="flex items-center justify-between ml-[64px] bg-slate-50/80 px-3 py-2 rounded-[14px] border border-slate-100/50">
+                         <span class="text-[10px] text-slate-500 font-bold tracking-wider">${camp.subtitle}</span>
+                         <span class="text-xs font-black ${camp.text}">${camp.benefit}</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function openSheet(camp) {
+            document.getElementById('sheet-title').textContent = camp.title;
+            document.getElementById('sheet-subtitle').textContent = camp.subtitle;
+            document.getElementById('sheet-benefit').textContent = camp.benefit;
+            document.getElementById('sheet-icon-box').className = `w-12 h-12 rounded-[20px] flex items-center justify-center text-white shrink-0 shadow-inner ${camp.color}`;
+            document.getElementById('sheet-icon-box').innerHTML = `<i data-lucide="${camp.icon}" class="w-6 h-6"></i>`;
+            
+            document.getElementById('sheet-tips').textContent = camp.tips;
+
+            const conditionsHtml = camp.conditions.map(c => `<li class="flex items-start space-x-2.5"><span class="text-emerald-500 mt-0.5 text-lg leading-none">•</span><span class="pt-0.5">${c}</span></li>`).join('');
+            document.getElementById('sheet-conditions').innerHTML = conditionsHtml;
+
+            const exclusionsContainer = document.getElementById('sheet-exclusions-container');
+            if (camp.exclusions && camp.exclusions.length > 0) {
+                exclusionsContainer.classList.remove('hidden');
+                const exclusionsHtml = camp.exclusions.map(c => `<li class="flex items-start space-x-2.5"><span class="text-red-500 mt-0.5 text-[10px] font-black">※</span><span class="pt-0.5">${c}</span></li>`).join('');
+                document.getElementById('sheet-exclusions').innerHTML = exclusionsHtml;
+            } else {
+                exclusionsContainer.classList.add('hidden');
+            }
+
+            activeUrlToOpen = camp.url || BASE_URL;
+
+            const sheet = document.getElementById('bottom-sheet');
+            const backdrop = document.getElementById('sheet-backdrop');
+            const content = document.getElementById('sheet-content');
+            
+            sheet.classList.remove('pointer-events-none');
+            backdrop.classList.remove('opacity-0');
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('translate-y-full');
+            lucide.createIcons();
+        }
+
+        function closeSheet() {
+            const sheet = document.getElementById('bottom-sheet');
+            const backdrop = document.getElementById('sheet-backdrop');
+            const content = document.getElementById('sheet-content');
+            
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+            setTimeout(() => { sheet.classList.add('pointer-events-none'); }, 300);
+        }
+
+        function openOfficialSiteFromSheet() {
+            try { window.open(activeUrlToOpen, '_blank', 'noopener,noreferrer'); } 
+            catch (e) {
+                const a = document.createElement('a');
+                a.href = activeUrlToOpen; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            }
+        }
+    </script>
+</body>
+</html>
