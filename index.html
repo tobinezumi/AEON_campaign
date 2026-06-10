@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -14,7 +15,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="イオンCP">
-<link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="./manifest.json">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,41 +58,10 @@
 
         .sheet-handle { width: 36px; height: 5px; background-color: #cbd5e1; border-radius: 99px; margin: 8px auto 16px auto; }
 
-        /* スプラッシュ全体(白背景含む)のフェードアウトを1.5秒に設定 */
+        /* スプラッシュ全体(白背景含む)のフェードアウトを1秒に設定 */
         #splash-screen {
-            transition: opacity 1.5s ease-in-out;
-        }
-
-        /* アイコンのフェードインアニメーション */
-        @keyframes iconAppear {
-            0% { opacity: 0; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .icon-appear {
-            /* 最初は完全に透明（白背景だけが見える状態） */
-            opacity: 0;
-            /* 0.6秒待ってから、0.8秒かけてフェードイン。終わったらそのまま表示保持(forwards) */
-            animation: iconAppear 0.8s ease-out 0.6s forwards;
-        }
-
-        /* キラキラ光るエフェクト (Shimmer) */
-        @keyframes shimmer {
-            0% { transform: translateX(-150%) skewX(-15deg); }
-            100% { transform: translateX(250%) skewX(-15deg); }
-        }
-        .shimmer-effect::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40%;
-            height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
-            /* 初期位置を固定して見えなくする */
-            transform: translateX(-150%) skewX(-15deg);
-            /* アイコンが完全に表示されるタイミング(0.6s + 0.8s = 1.4s後)に、1.2秒かけて1回だけ光る */
-            animation: shimmer 1.2s ease-in-out 1.4s 1 forwards;
-            z-index: 20;
+            transition: opacity 1.0s ease-in-out;
+            pointer-events: none; /* フェードアウト中の操作ブロックを防止 */
         }
     </style>
 </head>
@@ -100,23 +70,8 @@
     <!-- ========================================== -->
     <!-- 扉ページ (Splash Screen) -->
     <!-- ========================================== -->
-    <!-- 背景は完全に真っ白 (bg-white) -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center opacity-100">
-        <!-- 0.6秒後に0.8秒で現れるアイコン (icon-appear クラス) -->
-        <div class="icon-appear w-64 h-64 rounded-[56px] bg-gradient-to-b from-[#e6007e] to-[#a0005a] shadow-[0_20px_50px_-12px_rgba(181,0,107,0.5)] flex flex-col items-center justify-center text-white p-4 relative overflow-hidden shimmer-effect">
-            <!-- ちょっとした光沢感（上部のハイライト） -->
-            <div class="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-b-[100%]"></div>
-            
-            <div class="relative z-10 flex flex-col items-center">
-                <div class="flex items-center justify-center mb-2">
-                    <span class="text-[32px] font-sans font-black tracking-widest" style="font-family: Arial, sans-serif;">
-                        AEON
-                    </span>
-                </div>
-                <div class="text-[22px] font-black tracking-widest mb-6">定期キャンペーン</div>
-                <i data-lucide="calendar-days" class="w-24 h-24 stroke-[1.5]"></i>
-            </div>
-        </div>
+    <!-- アイコン無しの真っ白画面 -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white opacity-100 flex items-center justify-center">
     </div>
 
     <!-- Top App Bar -->
@@ -311,189 +266,16 @@
         const BASE_URL = 'https://www.aeonretail.jp/sp/otoku/';
 
         const CAMPAIGNS = [
-            { 
-                id: 'kansha_day', 
-                title: 'お客さま感謝デー', 
-                shortTitle: '感謝デー', 
-                subtitle: '毎月20日・30日', 
-                benefit: '5% OFF', 
-                url: 'https://www.aeonretail.jp/otoku/kansyaday.html', 
-                conditions: [
-                    'イオンカードのご提示（現金払い含む）、またはお支払い', 
-                    'AEON Payのスマホ決済、イオンiD', 
-                    '電子マネーWAONのお支払い', 
-                    'イオンオーナーズカードのご提示'
-                ],
-                exclusions: [
-                    'WAON POINTカードのご提示のみ',
-                    '他社発行のクレジットカード・電子マネー',
-                    'ビール・発泡酒、たばこ、書籍、ゲーム機本体など特定商品',
-                    '一部の専門店（各店舗へ要確認）'
-                ],
-                tips: 'お支払い前に必ずイオンカード等のご提示をお願いしてください。ポイントカードのみでは5%OFFにならない点がお客さまからよく質問されます。', 
-                color: 'bg-pink-500', dotColor: 'bg-pink-500', bgSoft: 'bg-pink-50', borderSoft: 'border-pink-100', text: 'text-pink-600', dates: [20, 30], icon: 'percent' 
-            },
-            { 
-                id: 'ariga10_day', 
-                title: 'ありが10デー', 
-                shortTitle: 'ありが10', 
-                subtitle: '毎月10日', 
-                benefit: 'ポイント5〜10倍', 
-                url: 'https://www.aeonretail.jp/campaign/ariga10/', 
-                conditions: [
-                    'AEON Payのスマホ決済で【10倍】', 
-                    'イオンカードのクレジット払い・提示で【5倍】', 
-                    '電子マネーWAONのお支払いで【5倍】'
-                ],
-                exclusions: [
-                    'WAON POINTのご利用分（ポイントでのお支払い分）',
-                    '調剤薬品、たばこ、商品券など特定商品',
-                    '他の倍付け企画（いつでもポイント2倍など）との併用'
-                ], 
-                tips: 'AEON Pay決済が一番お得（10倍）であることをご案内すると喜ばれます。「ポイントでお支払いした分にはポイントが付きません」という点はトラブル防止のためご注意ください。', 
-                color: 'bg-amber-500', dotColor: 'bg-amber-400', bgSoft: 'bg-amber-50', borderSoft: 'border-amber-100', text: 'text-amber-600', dates: [10], icon: 'star' 
-            },
-            { 
-                id: 'gg_day', 
-                title: 'G.G感謝デー', 
-                shortTitle: 'G.G感謝', 
-                subtitle: '毎月15日 (55歳以上)', 
-                benefit: '5% OFF', 
-                url: 'https://www.aeonretail.jp/otoku/ggkansyaday/', 
-                conditions: [
-                    '55歳以上のお客さま', 
-                    'G.Gマーク付きのイオンカード決済、またはG.G WAON等の利用'
-                ],
-                exclusions: [
-                    'イオンカードのクレジット払いは【レジでの割引ではなくご請求時】に5%割引',
-                    'AEON Payのチャージ払い・WAON POINT利用分',
-                    '通常のWAONカード（事前にWAONステーションでの設定が必要）',
-                    'ビール・発泡酒、たばこなど特定商品'
-                ], 
-                tips: 'クレジット払いのお客さまには「レジではそのままの金額ですが、お引き落としの際に5%割引されます」と必ずお伝えください。毎月15日は「わくわくデー（ポイント2倍）」も同時開催です。', 
-                color: 'bg-purple-500', dotColor: 'bg-purple-500', bgSoft: 'bg-purple-50', borderSoft: 'border-purple-100', text: 'text-purple-600', dates: [15], icon: 'user-check' 
-            },
-            { 
-                id: 'tuyou_ichi', 
-                title: '火曜市', 
-                shortTitle: '火曜市', 
-                subtitle: '毎週火曜日開催', 
-                benefit: '直営・専門店特典', 
-                url: 'https://www.aeon.jp/sc/tsudanuma/special/kayouichi/', 
-                conditions: [
-                    '直営店は「午前中セール（～12:00まで）」と「夕方市」を実施',
-                    '専門店でも飲食・サービス等の火曜限定特典あり'
-                ],
-                exclusions: [
-                    '専門店の特典は店舗ごとに異なります。',
-                    '（例：一部商品の除外、内容が予告なく変更される場合あり）'
-                ], 
-                tips: '直営店の特売だけでなく、モール全体でお得な日です。お客さまに専門店（カルディ、サブウェイ等）での5%OFFや限定割引もやっていることをご案内すると、モール内の回遊率アップに繋がります。', 
-                color: 'bg-orange-500', dotColor: 'bg-orange-500', bgSoft: 'bg-orange-50', borderSoft: 'border-orange-100', text: 'text-orange-600', dayOfWeek: 2, icon: 'shopping-cart' 
-            },
-            { 
-                id: 'installment_free', 
-                title: '分割払い手数料0', 
-                shortTitle: '分割手数料', 
-                subtitle: '毎月20日・30日', 
-                benefit: '分割手数料無料', 
-                url: 'https://www.aeon.co.jp/benefits/bunkatsu0/', 
-                conditions: [
-                    '毎月20日・30日の限定開催',
-                    'イオンカードのクレジット払いで対象の分割払いを選択',
-                    '※1回のご精算金額が税込1万円以上、かつ月々のお支払金額が税込3千円以上'
-                ],
-                exclusions: [
-                    'ボーナス併用払いは対象外',
-                    '一部の専門店および商品は対象外'
-                ], 
-                tips: '毎月20日・30日の「お客さま感謝デー」と同日開催です。家電などの高額商品をご検討中のお客さまには、感謝デーの割引と合わせて「本日なら分割手数料も無料ですよ」とお声がけすると成約率が上がります。', 
-                color: 'bg-teal-500', dotColor: 'bg-teal-400', bgSoft: 'bg-teal-50', borderSoft: 'border-teal-100', text: 'text-teal-600', dates: [20, 30], icon: 'credit-card' 
-            },
-            { 
-                id: 'yellow_receipt', 
-                title: '幸せの黄色いレシート', 
-                shortTitle: '黄色レシート', 
-                subtitle: '毎月11日', 
-                benefit: '1%が寄付に', 
-                url: BASE_URL, 
-                conditions: ['発行された黄色いレシートを専用ボックスに投函していただく'],
-                exclusions: [], 
-                tips: 'レジでお渡しする際、「よろしければ専用ボックスにご投函ください、地域のボランティア支援になります」と一言添えるのがポイントです。', 
-                color: 'bg-yellow-400', dotColor: 'bg-yellow-400', bgSoft: 'bg-yellow-50', borderSoft: 'border-yellow-200', text: 'text-yellow-700', dates: [11], icon: 'receipt' 
-            },
-            { 
-                id: 'pet_10x', 
-                title: 'ペットフード・用品10倍', 
-                shortTitle: 'ペット10倍', 
-                subtitle: '1,2,11,12,21,22日', 
-                benefit: 'ポイント10倍', 
-                url: 'https://www.aeonretail.jp/campaign/pointC-pet/', 
-                conditions: [
-                    'イオン・イオンスタイル直営のペット売場', 
-                    'イオンマークのカードクレジット払い、AEON Pay決済'
-                ],
-                exclusions: [
-                    'イオンモール内のペット専門店',
-                    'WAON POINT払い、電子マネーWAON決済'
-                ], 
-                tips: '直営売場専用の企画です。モール内のペット専門店（テナント）でお買物されたお客様から「ポイント10倍にならないの？」と聞かれることがあるため、「直営売場のみのキャンペーンです」とご案内ください。', 
-                color: 'bg-emerald-500', dotColor: 'bg-emerald-500', bgSoft: 'bg-emerald-50', borderSoft: 'border-emerald-100', text: 'text-emerald-600', dates: [1, 2, 11, 12, 21, 22], icon: 'dog' 
-            },
-            { 
-                id: 'oral_10x', 
-                title: 'オーラルケアポイント10倍', 
-                shortTitle: 'ｵｰﾗﾙ10倍', 
-                subtitle: '毎月5日', 
-                benefit: 'ポイント10倍', 
-                url: 'https://www.aeonretail.jp/campaign/pointC-oral/', 
-                conditions: [
-                    'イオン・イオンスタイル直営のオーラルケア売場', 
-                    'イオンマークのカードクレジット払い、AEON Pay決済'
-                ],
-                exclusions: [
-                    '医薬品、ベビー・おもちゃ売場の商品',
-                    '専門店での購入'
-                ], 
-                tips: 'ハブラシ、歯磨き粉、マウスウォッシュ等が対象です。5日は「お客さまわくわくデー（ポイント2倍）」とも重なりますが、重複はせず「10倍」が優先されます。', 
-                color: 'bg-cyan-500', dotColor: 'bg-cyan-400', bgSoft: 'bg-cyan-50', borderSoft: 'border-cyan-100', text: 'text-cyan-600', dates: [5], icon: 'sparkles' 
-            },
-            { 
-                id: 'hair_10x', 
-                title: 'ヘアカラーポイント10倍', 
-                shortTitle: 'ﾍｱｶﾗｰ10倍', 
-                subtitle: '毎月5, 15, 25日', 
-                benefit: 'ポイント10倍', 
-                url: 'https://www.aeonretail.jp/campaign/pointC-hairc/', 
-                conditions: [
-                    'イオン・イオンスタイル直営売場', 
-                    'イオンマークのカードクレジット払い、AEON Pay決済'
-                ],
-                exclusions: [
-                    '一部の制度化粧品（スティーブンノル等）',
-                    '専門店での購入'
-                ], 
-                tips: '制度化粧品の一部は対象外となるため、お客さまに聞かれたら商品のブランドを確認してください。毎月5・15・25日と覚えやすい日程です。', 
-                color: 'bg-fuchsia-500', dotColor: 'bg-fuchsia-400', bgSoft: 'bg-fuchsia-50', borderSoft: 'border-fuchsia-100', text: 'text-fuchsia-600', dates: [5, 15, 25], icon: 'scissors' 
-            },
-            { 
-                id: 'shampoo_10x', 
-                title: 'シャンプー・リンス10倍', 
-                shortTitle: 'ｼｬﾝﾌﾟｰ10倍', 
-                subtitle: '毎月5, 10日', 
-                benefit: 'ポイント10倍', 
-                url: 'https://www.aeonretail.jp/campaign/pointC-shampoo/', 
-                conditions: [
-                    'イオン・イオンスタイル直営売場', 
-                    'イオンマークのカードクレジット払い、AEON Pay決済'
-                ],
-                exclusions: [
-                    'キュレル、ミノン、ハウスオブローゼ等の特定ブランド',
-                    'カラーシャンプー、ベビー用、ペット用'
-                ], 
-                tips: '対象外のブランドや種類（ベビー用など）が細かく分かれているので注意が必要です。迷った場合はサービスカウンターへの案内か、対象外リストをご確認ください。', 
-                color: 'bg-blue-500', dotColor: 'bg-blue-400', bgSoft: 'bg-blue-50', borderSoft: 'border-blue-100', text: 'text-blue-600', dates: [5, 10], icon: 'droplet' 
-            }
+            { id: 'kansha_day', title: 'お客さま感謝デー', shortTitle: '感謝デー', subtitle: '毎月20日・30日', benefit: '5% OFF', url: 'https://www.aeonretail.jp/otoku/kansyaday.html', conditions: ['イオンカードのご提示（現金払い含む）、またはお支払い', 'AEON Payのスマホ決済、イオンiD', '電子マネーWAONのお支払い', 'イオンオーナーズカードのご提示'], exclusions: ['WAON POINTカードのご提示のみ', '他社発行のクレジットカード・電子マネー', 'ビール・発泡酒、たばこ、書籍、ゲーム機本体など特定商品', '一部の専門店（各店舗へ要確認）'], tips: 'お支払い前に必ずイオンカード等のご提示をお願いしてください。ポイントカードのみでは5%OFFにならない点がお客さまからよく質問されます。', color: 'bg-pink-500', dotColor: 'bg-pink-500', bgSoft: 'bg-pink-50', borderSoft: 'border-pink-100', text: 'text-pink-600', dates: [20, 30], icon: 'percent' },
+            { id: 'ariga10_day', title: 'ありが10デー', shortTitle: 'ありが10', subtitle: '毎月10日', benefit: 'ポイント5〜10倍', url: 'https://www.aeonretail.jp/campaign/ariga10/', conditions: ['AEON Payのスマホ決済で【10倍】', 'イオンカードのクレジット払い・提示で【5倍】', '電子マネーWAONのお支払いで【5倍】'], exclusions: ['WAON POINTのご利用分（ポイントでのお支払い分）', '調剤薬品、たばこ、商品券など特定商品', '他の倍付け企画（いつでもポイント2倍など）との併用'], tips: 'AEON Pay決済が一番お得（10倍）であることをご案内すると喜ばれます。「ポイントでお支払いした分にはポイントが付きません」という点はトラブル防止のためご注意ください。', color: 'bg-amber-500', dotColor: 'bg-amber-400', bgSoft: 'bg-amber-50', borderSoft: 'border-amber-100', text: 'text-amber-600', dates: [10], icon: 'star' },
+            { id: 'gg_day', title: 'G.G感謝デー', shortTitle: 'G.G感謝', subtitle: '毎月15日 (55歳以上)', benefit: '5% OFF', url: 'https://www.aeonretail.jp/otoku/ggkansyaday/', conditions: ['55歳以上のお客さま', 'G.Gマーク付きのイオンカード決済、またはG.G WAON等の利用'], exclusions: ['イオンカードのクレジット払いは【レジでの割引ではなくご請求時】に5%割引', 'AEON Payのチャージ払い・WAON POINT利用分', '通常のWAONカード（事前にWAONステーションでの設定が必要）', 'ビール・発泡酒、たばこなど特定商品'], tips: 'クレジット払いのお客さまには「レジではそのままの金額ですが、お引き落としの際に5%割引されます」と必ずお伝えください。毎月15日は「わくわくデー（ポイント2倍）」も同時開催です。', color: 'bg-purple-500', dotColor: 'bg-purple-500', bgSoft: 'bg-purple-50', borderSoft: 'border-purple-100', text: 'text-purple-600', dates: [15], icon: 'user-check' },
+            { id: 'tuyou_ichi', title: '火曜市', shortTitle: '火曜市', subtitle: '毎週火曜日開催', benefit: '直営・専門店特典', url: 'https://www.aeon.jp/sc/tsudanuma/special/kayouichi/', conditions: ['直営店は「午前中セール（～12:00まで）」と「夕方市」を実施', '専門店でも飲食・サービス等の火曜限定特典あり'], exclusions: ['専門店の特典は店舗ごとに異なります。', '（例：一部商品の除外、内容が予告なく変更される場合あり）'], tips: '直営店の特売だけでなく、モール全体でお得な日です。お客さまに専門店（カルディ、サブウェイ等）での5%OFFや限定割引もやっていることをご案内すると、モール内の回遊率アップに繋がります。', color: 'bg-orange-500', dotColor: 'bg-orange-500', bgSoft: 'bg-orange-50', borderSoft: 'border-orange-100', text: 'text-orange-600', dayOfWeek: 2, icon: 'shopping-cart' },
+            { id: 'installment_free', title: '分割払い手数料0', shortTitle: '分割手数料', subtitle: '毎月20日・30日', benefit: '分割手数料無料', url: 'https://www.aeon.co.jp/benefits/bunkatsu0/', conditions: ['毎月20日・30日の限定開催', 'イオンカードのクレジット払いで対象の分割払いを選択', '※1回のご精算金額が税込1万円以上、かつ月々のお支払金額が税込3千円以上'], exclusions: ['ボーナス併用払いは対象外', '一部の専門店および商品は対象外'], tips: '毎月20日・30日の「お客さま感謝デー」と同日開催です。家電などの高額商品をご検討中のお客さまには、感謝デーの割引と合わせて「本日なら分割手数料も無料ですよ」とお声がけすると成約率が上がります。', color: 'bg-teal-500', dotColor: 'bg-teal-400', bgSoft: 'bg-teal-50', borderSoft: 'border-teal-100', text: 'text-teal-600', dates: [20, 30], icon: 'credit-card' },
+            { id: 'yellow_receipt', title: '幸せの黄色いレシート', shortTitle: '黄色レシート', subtitle: '毎月11日', benefit: '1%が寄付に', url: BASE_URL, conditions: ['発行された黄色いレシートを専用ボックスに投函していただく'], exclusions: [], tips: 'レジでお渡しする際、「よろしければ専用ボックスにご投函ください、地域のボランティア支援になります」と一言添えるのがポイントです。', color: 'bg-yellow-400', dotColor: 'bg-yellow-400', bgSoft: 'bg-yellow-50', borderSoft: 'border-yellow-200', text: 'text-yellow-700', dates: [11], icon: 'receipt' },
+            { id: 'pet_10x', title: 'ペットフード・用品10倍', shortTitle: 'ペット10倍', subtitle: '1,2,11,12,21,22日', benefit: 'ポイント10倍', url: 'https://www.aeonretail.jp/campaign/pointC-pet/', conditions: ['イオン・イオンスタイル直営のペット売場', 'イオンマークのカードクレジット払い、AEON Pay決済'], exclusions: ['イオンモール内のペット専門店', 'WAON POINT払い、電子マネーWAON決済'], tips: '直営売場専用の企画です。モール内のペット専門店（テナント）でお買物されたお客様から「ポイント10倍にならないの？」と聞かれることがあるため、「直営売場のみのキャンペーンです」とご案内ください。', color: 'bg-emerald-500', dotColor: 'bg-emerald-500', bgSoft: 'bg-emerald-50', borderSoft: 'border-emerald-100', text: 'text-emerald-600', dates: [1, 2, 11, 12, 21, 22], icon: 'dog' },
+            { id: 'oral_10x', title: 'オーラルケアポイント10倍', shortTitle: 'ｵｰﾗﾙ10倍', subtitle: '毎月5日', benefit: 'ポイント10倍', url: 'https://www.aeonretail.jp/campaign/pointC-oral/', conditions: ['イオン・イオンスタイル直営のオーラルケア売場', 'イオンマークのカードクレジット払い、AEON Pay決済'], exclusions: ['医薬品、ベビー・おもちゃ売場の商品', '専門店での購入'], tips: 'ハブラシ、歯磨き粉、マウスウォッシュ等が対象です。5日は「お客さまわくわくデー（ポイント2倍）」とも重なりますが、重複はせず「10倍」が優先されます。', color: 'bg-cyan-500', dotColor: 'bg-cyan-400', bgSoft: 'bg-cyan-50', borderSoft: 'border-cyan-100', text: 'text-cyan-600', dates: [5], icon: 'sparkles' },
+            { id: 'hair_10x', title: 'ヘアカラーポイント10倍', shortTitle: 'ﾍｱｶﾗｰ10倍', subtitle: '毎月5, 15, 25日', benefit: 'ポイント10倍', url: 'https://www.aeonretail.jp/campaign/pointC-hairc/', conditions: ['イオン・イオンスタイル直営売場', 'イオンマークのカードクレジット払い、AEON Pay決済'], exclusions: ['一部の制度化粧品（スティーブンノル等）', '専門店での購入'], tips: '制度化粧品の一部は対象外となるため、お客さまに聞かれたら商品のブランドを確認してください。毎月5・15・25日と覚えやすい日程です。', color: 'bg-fuchsia-500', dotColor: 'bg-fuchsia-400', bgSoft: 'bg-fuchsia-50', borderSoft: 'border-fuchsia-100', text: 'text-fuchsia-600', dates: [5, 15, 25], icon: 'scissors' },
+            { id: 'shampoo_10x', title: 'シャンプー・リンス10倍', shortTitle: 'ｼｬﾝﾌﾟｰ10倍', subtitle: '毎月5, 10日', benefit: 'ポイント10倍', url: 'https://www.aeonretail.jp/campaign/pointC-shampoo/', conditions: ['イオン・イオンスタイル直営売場', 'イオンマークのカードクレジット払い、AEON Pay決済'], exclusions: ['キュレル、ミノン、ハウスオブローゼ等の特定ブランド', 'カラーシャンプー、ベビー用、ペット用'], tips: '対象外のブランドや種類（ベビー用など）が細かく分かれているので注意が必要です。迷った場合はサービスカウンターへの案内か、対象外リストをご確認ください。', color: 'bg-blue-500', dotColor: 'bg-blue-400', bgSoft: 'bg-blue-50', borderSoft: 'border-blue-100', text: 'text-blue-600', dates: [5, 10], icon: 'droplet' }
         ];
 
         let currentDate = new Date(2026, 5, 7); 
@@ -523,25 +305,22 @@
             renderTodayTab();
 
             // 扉ページの制御
-            // 0.6s(白待機) + 0.8s(出現) + 2.0s(待機) = 3.4秒(3400ms)後にフェードアウト開始
-            setTimeout(() => {
+            // 待機時間ゼロで、1秒かけてゆったりとフェードアウト
+            requestAnimationFrame(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
                     splash.classList.remove('opacity-100');
                     splash.classList.add('opacity-0');
-                    // クロスフェードの長さ(1.5秒)に合わせて完全に非表示にする
                     setTimeout(() => {
                         splash.style.display = 'none';
-                        // 扉ページが消えた後にインストール案内バナーを出す
                         showInstallBanner();
-                    }, 1500); 
+                    }, 1000); 
                 }
-            }, 3400); 
+            });
         };
 
         // アプリとしてホーム画面に追加する案内バナーを表示
         function showInstallBanner() {
-            // 既にスタンドアロンモード（アプリとして起動中）または非表示設定なら出さない
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem('hideInstallBanner')) {
                 return;
             }
@@ -573,13 +352,11 @@
 
         async function triggerInstall() {
             if (deferredPrompt) {
-                // 自動インストールプロンプトを表示 (Android Chrome等)
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 closeInstallBanner();
             } else {
-                // iOS Safariなど自動プロンプトが出ない場合の手動案内
                 alert('ブラウザの下部メニュー「共有」から「ホーム画面に追加」を選択してください。');
                 closeInstallBanner();
             }
