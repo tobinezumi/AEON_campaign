@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -58,21 +57,19 @@ html
 
         .sheet-handle { width: 36px; height: 5px; background-color: #cbd5e1; border-radius: 99px; margin: 8px auto 16px auto; }
 
-        /* スプラッシュ全体(白背景含む)のフェードアウトを1秒に設定 */
-        #splash-screen {
-            transition: opacity 1.0s ease-in-out;
-            pointer-events: none; /* フェードアウト中の操作ブロックを防止 */
+        /* OSのスプラッシュ終了後、アプリ全体をフワッとフェードインさせる */
+        @keyframes appStartFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .app-fade-in {
+            opacity: 0;
+            animation: appStartFadeIn 1s ease-out forwards;
         }
     </style>
 </head>
-<body class="bg-aeon-bg text-slate-800 font-sans min-h-screen pb-24 overflow-x-hidden">
-
-    <!-- ========================================== -->
-    <!-- 扉ページ (Splash Screen) -->
-    <!-- ========================================== -->
-    <!-- アイコン無しの真っ白画面 -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white opacity-100 flex items-center justify-center">
-    </div>
+<!-- bodyにフェードインアニメーションのクラスを追加 -->
+<body class="bg-aeon-bg text-slate-800 font-sans min-h-screen pb-24 overflow-x-hidden app-fade-in">
 
     <!-- Top App Bar -->
     <header class="fixed top-0 w-full z-40 bg-gradient-to-r from-pink-50/95 via-white/95 to-white/95 backdrop-blur-xl border-b border-pink-100/50 shadow-header">
@@ -304,19 +301,12 @@ html
             setCalendarMode('week');
             renderTodayTab();
 
-            // 扉ページの制御
-            // 待機時間ゼロで、1秒かけてゆったりとフェードアウト
-            requestAnimationFrame(() => {
-                const splash = document.getElementById('splash-screen');
-                if(splash) {
-                    splash.classList.remove('opacity-100');
-                    splash.classList.add('opacity-0');
-                    setTimeout(() => {
-                        splash.style.display = 'none';
-                        showInstallBanner();
-                    }, 1000); 
-                }
-            });
+            // JSのダミースプラッシュは使わず、ページ読み込みと同時に
+            // すでにCSSでかかっている body 全体のフェードインに任せる
+            // インストールバナーは表示完了後（1秒後）に出す
+            setTimeout(() => {
+                showInstallBanner();
+            }, 1000); 
         };
 
         // アプリとしてホーム画面に追加する案内バナーを表示
